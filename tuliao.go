@@ -26,21 +26,21 @@ package main
 
 import (
 	"net/http"
+
 	_ "github.com/go-sql-driver/mysql"
 )
-
-
-
 
 func main() {
 
 	//
 	http.HandleFunc("/getVerifyCodeByEmail", getVerifyCodeByEmail)
 	http.HandleFunc("/regist", regist)
-	http.HandleFunc("/login",login)
+	http.HandleFunc("/login", login)
+	http.HandleFunc("/getUsers", getUsers)
+	http.HandleFunc("/uploadPosition", uploadPosition)
+	http.HandleFunc("/uploadMsg", uploadMsg)
+	http.HandleFunc("/getMsgs", getMsgs)
+	http.HandleFunc("/uploadBroadcast", uploadBroadcast)
 	http.ListenAndServe(":1582", nil)
 
 }
-
-
-

@@ -1,19 +1,18 @@
 package main
 
-
-
 import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
+
 	_ "github.com/go-sql-driver/mysql"
 	"gopkg.in/gomail.v2"
 )
 
-
 func getVerifyCodeByEmail(w http.ResponseWriter, r *http.Request) {
+
 	decoder := json.NewDecoder(r.Body)
 	var params map[string]string
 	decoder.Decode(&params)
@@ -27,6 +26,7 @@ func getVerifyCodeByEmail(w http.ResponseWriter, r *http.Request) {
 	//
 	index, err := insertVerifyCodeIntoDb(email, verifyCode)
 	if err != nil || index == -1 {
+
 		fmt.Fprintf(w, `{"code":1,"msg":"生成验证码失败"}`)
 		return
 	}
@@ -56,7 +56,6 @@ func getVerifyCodeByEmail(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
 //随机生成字符串
 func getRandomString(l int) string {
 	str := "0123456789abcdefghijklmnopqrstuvwxyz"
@@ -69,16 +68,16 @@ func getRandomString(l int) string {
 	return string(result)
 }
 
-
-
 func insertVerifyCodeIntoDb(email string, verifyCode string) (int64, error) {
 	if !hasDbInit {
 		initDb()
 	}
 	insForm, err := myDb.Prepare("insert into verify_code(email,verify_code)values(?,?)on duplicate key update verify_code=?")
 	if err != nil {
+
 		return -1, err
 	}
+
 	insForm.Exec(email, verifyCode, verifyCode)
 	return 0, nil
 }

@@ -3,8 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"time"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var myDb *sql.DB
@@ -12,7 +13,7 @@ var hasDbInit bool
 
 const (
 	username = "root"
-	password = ""
+	password = "root"
 	network  = "tcp"
 	server   = "localhost"
 	port     = 3306

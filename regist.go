@@ -1,16 +1,14 @@
 package main
 
-
 import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
 	_ "github.com/go-sql-driver/mysql"
 )
-
-
 
 func regist(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
@@ -53,8 +51,6 @@ func regist(w http.ResponseWriter, r *http.Request) {
 
 }
 
-
-
 func isAccountExist(email string) bool {
 
 	if !hasDbInit {
@@ -63,8 +59,6 @@ func isAccountExist(email string) bool {
 	rows, _ := myDb.Query("select * from account where email=?", email)
 	return rows.Next()
 }
-
-
 
 func insertAccountIntoDb(email string, pwdMd5 string) error {
 	if !hasDbInit {
@@ -78,8 +72,6 @@ func insertAccountIntoDb(email string, pwdMd5 string) error {
 	return nil
 }
 
-
-
 func getVerifyCodeByEmailFromDB(email string) (string, error) {
 	if !hasDbInit {
 		initDb()
@@ -87,12 +79,9 @@ func getVerifyCodeByEmailFromDB(email string) (string, error) {
 	verifyCode := new(verifyCode)
 	row := myDb.QueryRow("select * from verify_code where email=?", email)
 
-	err := row.Scan(&verifyCode.ID, &verifyCode.Email, &verifyCode.VerifyCode)
+	err := row.Scan(&verifyCode.Email, &verifyCode.VerifyCode)
 	if err != nil {
 		return "", err
 	}
 	return verifyCode.VerifyCode, err
 }
-
-
-
