@@ -18,6 +18,11 @@ func uploadPosition(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 	sec := now.Unix()
 
+	fmt.Println(lng)
+	fmt.Println(lat)
+	fmt.Println(sec)
+	fmt.Println(email)
+
 	err1 := updatePositionDB(lng, lat, sec, email)
 
 	var uploadPositionResponse uploadPositionResponse
