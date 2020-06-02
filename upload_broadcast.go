@@ -17,18 +17,29 @@ func uploadBroadcast(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 	sec := now.Unix()
 
-	err1 := updateBroadcastDB(broadcast, sec, email)
-
 	var uploadBroadcastResponse uploadBroadcastResponse
-	if err1 != nil {
-		uploadBroadcastResponse.Code = 1
-		uploadBroadcastResponse.Message = "上传广播失败"
-		uploadBroadcastResponse.Data = err1.Error()
-	} else {
-		uploadBroadcastResponse.Code = 0
-		uploadBroadcastResponse.Message = "上传广播成功"
+
+	userAvailable := checkUserIsExistAndAvailable(email)
+	if !userAvailable{
+		uploadBroadcastResponse.Code = 2
+		uploadBroadcastResponse.Message = "连接超时，请重新登录"
 		uploadBroadcastResponse.Data = ""
+	}else{
+		err1 := updateBroadcastDB(broadcast, sec, email)
+
+	
+		if err1 != nil {
+			uploadBroadcastResponse.Code = 1
+			uploadBroadcastResponse.Message = "上传广播失败"
+			uploadBroadcastResponse.Data = err1.Error()
+		} else {
+			uploadBroadcastResponse.Code = 0
+			uploadBroadcastResponse.Message = "上传广播成功"
+			uploadBroadcastResponse.Data = ""
+		}
 	}
+
+	
 	var jsonData []byte
 	jsonData, err := json.Marshal(uploadBroadcastResponse)
 	if err != nil {

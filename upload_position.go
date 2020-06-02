@@ -18,23 +18,29 @@ func uploadPosition(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 	sec := now.Unix()
 
-	fmt.Println(lng)
-	fmt.Println(lat)
-	fmt.Println(sec)
-	fmt.Println(email)
-
-	err1 := updatePositionDB(lng, lat, sec, email)
-
 	var uploadPositionResponse uploadPositionResponse
-	if err1 != nil {
-		uploadPositionResponse.Code = 1
-		uploadPositionResponse.Message = "上传位置数据失败"
-		uploadPositionResponse.Data = err1.Error()
-	} else {
-		uploadPositionResponse.Code = 0
-		uploadPositionResponse.Message = "上传位置数据成功"
-		uploadPositionResponse.Data = ""
+
+	userAvailable:=checkUserIsExistAndAvailable(email)
+
+	if !userAvailable{
+		uploadPositionResponse.Code = 2
+		uploadPositionResponse.Message = "连接超时，请重新登录"
+		uploadPositionResponse.Data =""
+	}else{
+		err1 := updatePositionDB(lng, lat, sec, email)
+
+		if err1 != nil {
+			uploadPositionResponse.Code = 1
+			uploadPositionResponse.Message = "上传位置数据失败"
+			uploadPositionResponse.Data = err1.Error()
+		} else {
+			uploadPositionResponse.Code = 0
+			uploadPositionResponse.Message = "上传位置数据成功"
+			uploadPositionResponse.Data = ""
+		}
 	}
+
+	
 	var jsonData []byte
 	jsonData, err := json.Marshal(uploadPositionResponse)
 	if err != nil {

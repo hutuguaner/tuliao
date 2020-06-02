@@ -33,7 +33,7 @@ import (
 func main() {
 
 	//
-	http.HandleFunc("/getVerifyCodeByEmail", getVerifyCodeByEmail)
+	
 	http.HandleFunc("/regist", regist)
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/getUsers", getUsers)

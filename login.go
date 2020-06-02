@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 func login(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +23,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 		loginResponseData.Message = "当前用户名正在被使用中，请更换其他用户名登录"
 		loginResponseData.Data = email
 	} else {
-
+		
 		err := insertEmailInDB(email)
 		if err != nil {
 			loginResponseData.Code = 0
@@ -48,11 +49,12 @@ func insertEmailInDB(email string) error {
 	if !hasDbInit {
 		initDb()
 	}
-	insForm, err := myDb.Prepare("insert into user(email)values(?)")
+	insForm, err := myDb.Prepare("insert into user(email,time_update)values(?,?)")
 	if err != nil {
 		return err
 	}
-	insForm.Exec(email)
+
+	insForm.Exec(email,time.Now().Unix())
 	return nil
 }
 

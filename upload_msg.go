@@ -18,18 +18,28 @@ func uploadMsg(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 	sec := now.Unix()
 
-	err1 := insertMsgIntoDB(from, to, content, sec)
-
 	var insertMsgResponse insertMsgResponse
-	if err1 != nil {
-		insertMsgResponse.Code = 1
-		insertMsgResponse.Message = "上传消息失败"
-		insertMsgResponse.Data = err1.Error()
-	} else {
-		insertMsgResponse.Code = 0
-		insertMsgResponse.Message = "上传消息成功"
+
+	userAvailable := checkUserIsExistAndAvailable(from)
+
+	if !userAvailable {
+		insertMsgResponse.Code = 2
+		insertMsgResponse.Message = "连接超时，请重新登录"
 		insertMsgResponse.Data = ""
+	} else {
+		err1 := insertMsgIntoDB(from, to, content, sec)
+
+		if err1 != nil {
+			insertMsgResponse.Code = 1
+			insertMsgResponse.Message = "上传消息失败"
+			insertMsgResponse.Data = err1.Error()
+		} else {
+			insertMsgResponse.Code = 0
+			insertMsgResponse.Message = "上传消息成功"
+			insertMsgResponse.Data = ""
+		}
 	}
+
 	var jsonData []byte
 	jsonData, err := json.Marshal(insertMsgResponse)
 	if err != nil {
