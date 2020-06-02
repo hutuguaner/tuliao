@@ -13,7 +13,7 @@ var hasDbInit bool
 
 const (
 	username = "root"
-	password = ""
+	password = "root"
 	network  = "tcp"
 	server   = "localhost"
 	port     = 3306
