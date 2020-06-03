@@ -140,7 +140,7 @@ func getUserFromDB() ([]user, error) {
 
 		timeUpdateInt64, err := strconv.ParseInt(u.TimeUpdate, 10, 64)
 		if err != nil {
-			panic(err)	
+			panic(err)
 		} else {
 			now := time.Now()
 			dis, _ := time.ParseDuration(connectTimeOut)
@@ -148,18 +148,16 @@ func getUserFromDB() ([]user, error) {
 			if timeUpdateInt64 < disBefore {
 				//超时
 				deleteUserFromDB(u.Email)
-				
+
 			} else {
 				//正常
 				users = append(users, u)
 			}
 		}
 
-		
 	}
 
 	return users, nil
 }
 
-
-var connectTimeOut = "-5m"
+var connectTimeOut = "-1m"
