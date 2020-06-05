@@ -41,6 +41,7 @@ func main() {
 	http.HandleFunc("/uploadMsg", uploadMsg)
 	http.HandleFunc("/getMsgs", getMsgs)
 	http.HandleFunc("/uploadBroadcast", uploadBroadcast)
-	http.ListenAndServe(":1582", nil)
+	http.HandleFunc("/getVersion",getVersion)
+	http.ListenAndServe(":1583", nil)
 
 }

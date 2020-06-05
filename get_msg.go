@@ -19,6 +19,7 @@ func getMsgs(w http.ResponseWriter, r *http.Request) {
 		getMsgsResponse.Code = 1
 		getMsgsResponse.Message = "获取消息失败"
 		getMsgsResponse.Data = nil
+		
 	} else {
 		getMsgsResponse.Code = 0
 		getMsgsResponse.Message = "获取消息成功"
