@@ -15,7 +15,7 @@ func regist(w http.ResponseWriter, r *http.Request) {
 	var params map[string]string
 	decoder.Decode(&params)
 	email := params["email"]
-	verifyCode := params["verifyCode"]
+	//verifyCode := params["verifyCode"]
 	pwd := params["password"]
 
 	//查看邮箱对应帐号是否存在
@@ -24,7 +24,7 @@ func regist(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	verifyCodeInDb, err := getVerifyCodeByEmailFromDB(email)
+	/* verifyCodeInDb, err := getVerifyCodeByEmailFromDB(email)
 	if err != nil {
 		fmt.Fprintf(w, `{"code":1,"msg":"验证码获取失败，请重新获取验证码"}`)
 		return
@@ -33,7 +33,7 @@ func regist(w http.ResponseWriter, r *http.Request) {
 	if verifyCode != verifyCodeInDb {
 		fmt.Fprintf(w, `{"code":1,"msg":"验证码错误，请输入正确验证码"}`)
 		return
-	}
+	} */
 
 	//密码加密
 	h := md5.New()
