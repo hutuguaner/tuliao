@@ -13,23 +13,14 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
 	var params map[string]string
 	decoder.Decode(&params)
-	email := params["email"]
+	//email := params["email"]
 
-	now := time.Now()
-	sec := now.Unix()
 
 	var getUsersResponse getUsersResponse
 
-	userAvailable := checkUserIsExistAndAvailable(email)
-	if !userAvailable {
-		getUsersResponse.Code = 2
-		getUsersResponse.Message = "连接超时，请重新登录"
-		getUsersResponse.Data = nil
-	} else {
-		err1 := updateTimeDB(sec, email)
-		users, err2 := getUserFromDB()
+	users, err2 := getUserFromDB()
 
-		if err1 != nil || err2 != nil {
+		if err2 != nil {
 			getUsersResponse.Code = 1
 			getUsersResponse.Message = "获取用户失败"
 			getUsersResponse.Data = nil
@@ -38,7 +29,6 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 			getUsersResponse.Message = "获取用户成功"
 			getUsersResponse.Data = users
 		}
-	}
 
 	var jsonData []byte
 	jsonData, err := json.Marshal(getUsersResponse)
@@ -50,32 +40,6 @@ func getUsers(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//判断当前用户是否存在 及当前用户是否可用，判断可用的规格：如果用户一个小时没有与服务器建立连接 则判定用户不可用，需要重新登录
-func checkUserIsExistAndAvailable(email string) bool {
-	if !hasDbInit {
-		initDb()
-	}
-	var timeUpdate int64
-	row := myDb.QueryRow("select time_update from user where email=?", email)
-	err := row.Scan(&timeUpdate)
-	if err != nil {
-		return false
-	} else {
-		now := time.Now()
-		dis, _ := time.ParseDuration(connectTimeOut)
-		disBefore := now.Add(dis).Unix()
-		if timeUpdate < disBefore {
-			//超时
-			deleteUserFromDB(email)
-			return false
-		} else {
-			//正常
-			return true
-		}
-
-	}
-
-}
 
 //将超时 用户 删除
 func deleteUserFromDB(email string) bool {
@@ -95,22 +59,6 @@ type getUsersResponse struct {
 	Code    int    `json:"code"`
 	Message string `json:"message"`
 	Data    []user `json:"data"`
-}
-
-//更新时间
-func updateTimeDB(stamp int64, email string) error {
-
-	if !hasDbInit {
-		initDb()
-	}
-	insForm, err := myDb.Prepare("update user set time_update=? where email=?")
-	if err != nil {
-
-		return err
-	}
-	insForm.Exec(stamp, email)
-
-	return nil
 }
 
 func getUserFromDB() ([]user, error) {

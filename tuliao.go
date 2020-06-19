@@ -37,10 +37,7 @@ func main() {
 	http.HandleFunc("/regist", regist)
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/getUsers", getUsers)
-	http.HandleFunc("/uploadPosition", uploadPosition)
-	http.HandleFunc("/uploadMsg", uploadMsg)
 	http.HandleFunc("/getMsgs", getMsgs)
-	http.HandleFunc("/uploadBroadcast", uploadBroadcast)
 	http.HandleFunc("/getVersion",getVersion)
 	http.ListenAndServe(":1583", nil)
 

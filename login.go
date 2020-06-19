@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 func login(w http.ResponseWriter, r *http.Request) {
@@ -12,28 +13,33 @@ func login(w http.ResponseWriter, r *http.Request) {
 	var params map[string]string
 	decoder.Decode(&params)
 	email := params["email"]
-	//pwd:=params["password"]
+	pwd:=params["password"]
 
-	//判断当前是否又相同 用户名的账号在登录
-	isUsed := emailIsUsed(email)
+	//查看邮箱对应帐号是否存在
+	if !isAccountExist(email) {
+		fmt.Fprintf(w, `{"code":1,"msg":"帐号不存在"}`)
+		return
+	}
+
+	//从数据库中 取出 密码 判断密码是否一致
+	pwdInDB := queryPwdFromDB(email)
+
+	//密码加密
+	h := md5.New()
+	h.Write([]byte(pwd))
+	pwdMd5 := hex.EncodeToString(h.Sum(nil))
+
 
 	var loginResponseData loginResponseData
-	if isUsed {
+	if pwdMd5!=pwdInDB {
 		loginResponseData.Code = 1
-		loginResponseData.Message = "当前用户名正在被使用中，请更换其他用户名登录"
+		loginResponseData.Message = "密码错误"
 		loginResponseData.Data = email
 	} else {
 		
-		err := insertEmailInDB(email)
-		if err != nil {
-			loginResponseData.Code = 0
-			loginResponseData.Message = "登录失败"
-			loginResponseData.Data = email
-		} else {
-			loginResponseData.Code = 0
+		loginResponseData.Code = 0
 			loginResponseData.Message = "登录成功"
 			loginResponseData.Data = email
-		}
 	}
 
 	b, err := json.Marshal(loginResponseData)
@@ -45,32 +51,16 @@ func login(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func insertEmailInDB(email string) error {
+
+
+func queryPwdFromDB(email string) string {
 	if !hasDbInit {
 		initDb()
 	}
-	insForm, err := myDb.Prepare("insert into user(email,time_update)values(?,?)")
-	if err != nil {
-		return err
-	}
-
-	insForm.Exec(email,time.Now().Unix())
-	return nil
-}
-
-func emailIsUsed(email string) bool {
-	if !hasDbInit {
-		initDb()
-	}
-	row := myDb.QueryRow("select email from user where email=?", email)
-	emailQuery := ""
-	row.Scan(&emailQuery)
-	fmt.Println(emailQuery)
-	if emailQuery == email {
-		return true
-	} else {
-		return false
-	}
+	row := myDb.QueryRow("select password from account where email=?", email)
+	pwdQuery := ""
+	row.Scan(&pwdQuery)
+	return pwdQuery
 
 }
 
